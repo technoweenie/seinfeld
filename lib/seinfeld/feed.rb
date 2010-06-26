@@ -41,7 +41,6 @@ class Seinfeld
       resp = connection.get(url, 'If-None-Match' => user.etag)
       new(login, resp, url)
     rescue Yajl::ParseError, Faraday::Error::ClientError
-      puts $!
       # TODO: Raise Seinfeld::Feed::Error instead
       if $!.message =~ /404/
         nil # the user is missing, disable them
