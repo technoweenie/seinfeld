@@ -4,6 +4,7 @@ $LOAD_PATH.unshift File.expand_path(dir)
 require 'erb'
 require 'logger'
 require 'active_record' # v3
+require 'fileutils'
 
 # Gives all the AR models their own tablenamespace:
 #

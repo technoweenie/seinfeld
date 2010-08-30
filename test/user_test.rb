@@ -104,7 +104,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal Date.civil(2008, 1, 1),   @user.streak_end
   end
 
-  test "#update_progress with user, starting new strea" do
+  test "#update_progress with user, starting new streak" do
     parsed_dates = [Date.civil(2007, 12, 31), Date.civil(2008, 1, 2)]
 
     assert_equal 2, @user.progressions.count

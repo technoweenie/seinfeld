@@ -15,6 +15,17 @@
     #calendar
       = seinfeld
     #main
+      #zone
+        Location: 
+        == "#{@user.location}"
+        %a{:rel => "me", :href => "http://github.com/#{@user.login}"}
+          (from profile page)
+        |
+        Zone:
+        == "#{@user.time_zone}" 
+        |
+        Time left today:
+        == #{@user.time_left}
       #stats
         .current_streak
           %span.type
@@ -36,3 +47,6 @@
         Put the 
         %a{:href=> "/~#{@user.login}/widget"} JavaScript widget
         on your site!
+      #content.footnote
+        Geographical information provided by 
+        %a{:href => 'http://www.geonames.org'} GeoNames

@@ -4,8 +4,8 @@ class FeedTest < ActiveSupport::TestCase
   data = feed_data(:simple)
 
   setup_once do
-    Time.zone = 'Pacific Time (US & Canada)'
-    @feed = Seinfeld::Feed.new :technoweenie, data
+   Time.zone = 'Pacific Time (US & Canada)'
+   @feed = Seinfeld::Feed.new :technoweenie, data
   end
 
   test "parses JSON data" do

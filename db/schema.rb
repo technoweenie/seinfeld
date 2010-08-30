@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100530192310) do
+ActiveRecord::Schema.define(:version => 20100827203011) do
 
   create_table "seinfeld_progressions", :force => true do |t|
     t.date    "created_at"
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(:version => 20100530192310) do
     t.string  "time_zone",            :limit => 50
     t.boolean "disabled",                           :default => false
     t.string  "etag"
+    t.string  "location"
   end
 
   add_index "seinfeld_users", ["current_streak"], :name => "index_seinfeld_users_current_streak"
