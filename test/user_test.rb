@@ -152,4 +152,118 @@ class UserTest < ActiveSupport::TestCase
       :longest_streak_end   => Time.zone.local(2010, 6, 1)
     assert_equal "/~bob", user.longest_streak_url
   end
+
+  test "#update_location! if location is missing" do
+    user = Seinfeld::User.new :login => 'bob'
+    user.http_conn = \
+    Faraday::Connection.new do |builder|
+      builder.adapter :test do |stub|
+        stub.get('/api/v2/json/user/show/bob') do
+          [200, {}, '{"user":{"name":"Bob"}}']
+        end
+      end
+    end
+    user.update_location!
+    assert_equal nil, user.location
+  end
+
+  test "#update_location! if location is present" do
+    user = Seinfeld::User.new :login => 'bob'
+    user.http_conn = \
+    Faraday::Connection.new do |builder|
+      builder.adapter :test do |stub|
+        stub.get('/api/v2/json/user/show/bob') do
+          [200, {}, '{"user":{"name":"Bob","location":"Boulder, CO"}}']
+        end
+      end
+    end
+    user.update_location!
+    assert_equal "Boulder, CO", user.location
+  end
+
+  test "#update_timezone! if location is empty" do
+    user = Seinfeld::User.new :login => 'bob', :location => ''
+    user.update_timezone!
+    assert_equal nil, user.time_zone
+  end
+
+  test "#update_timezone! if no location can be found" do
+    user = Seinfeld::User.new :login => 'bob', :location => 'gibberish'
+    user.http_conn = \
+    Faraday::Connection.new do |builder|
+      builder.adapter :test do |stub|
+        stub.get('/searchJSON?q=gibberish&maxRows=1') do
+          [200, {}, '{"totalResultsCount":0,"geonames":[]}']
+        end
+      end
+    end
+    user.update_timezone!
+    assert_equal nil, user.time_zone
+  end
+
+  test "#update_timezone! if lat/lng are missing" do
+    user = Seinfeld::User.new :login => 'bob', :location => 'gibberish'
+    user.http_conn = \
+    Faraday::Connection.new do |builder|
+      builder.adapter :test do |stub|
+        stub.get('/searchJSON?q=gibberish&maxRows=1') do
+          [200, {}, '{"geonames":[{"countryName":"United States","adminCode1":"CO"}]}']
+        end
+      end
+    end
+    user.update_timezone!
+    assert_equal nil, user.time_zone
+  end
+
+  test "#update_timezone! if timezone_id is missing" do
+    user = Seinfeld::User.new :login => 'bob', :location => 'gibberish'
+    user.http_conn = \
+    Faraday::Connection.new do |builder|
+      builder.adapter :test do |stub|
+        stub.get('/searchJSON?q=gibberish&maxRows=1') do
+          [200, {}, '{"geonames":[{"lng":-105.2705456,"lat":40.0149856}]}']
+        end
+        stub.get('/timezoneJSON?lng=-105.2705456&lat=40.0149856') do
+          [200, {}, '{"rawOffset":0,"dstOffset":0,"gmtOffset":0,"lng":0,"lat":0}']
+        end
+      end
+    end
+    user.update_timezone!
+    assert_equal nil, user.time_zone
+  end
+
+  test "#update_timezone if unrecognized timezone" do
+    user = Seinfeld::User.new :login => 'bob', :location => 'gibberish'
+    user.http_conn = \
+    Faraday::Connection.new do |builder|
+      builder.adapter :test do |stub|
+        stub.get('/searchJSON?q=gibberish&maxRows=1') do
+          [200, {}, '{"geonames":[{"lng":-105.2705456,"lat":40.0149856}]}']
+        end
+        stub.get('/timezoneJSON?lng=-105.2705456&lat=40.0149856') do
+          [200, {}, '{"timezoneId":"Mars/Space"}']
+        end
+      end
+    end
+    user.update_timezone!
+    assert_equal nil, user.time_zone
+  end
+
+  test "#update_timezone! if all data is present" do
+    user = Seinfeld::User.new :login => 'bob', :location => 'gibberish'
+    user.http_conn = \
+    Faraday::Connection.new do |builder|
+      builder.adapter :test do |stub|
+        stub.get('/searchJSON?q=gibberish&maxRows=1') do
+          [200, {}, '{"geonames":[{"lng":-105.2705456,"lat":40.0149856}]}']
+        end
+        stub.get('/timezoneJSON?lng=-105.2705456&lat=40.0149856') do
+          [200, {}, '{"timezoneId":"America/Denver"}']
+        end
+      end
+    end
+    user.update_timezone!
+    assert_equal "Mountain Time (US & Canada)", user.time_zone
+  end
+
 end
