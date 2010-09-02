@@ -147,7 +147,6 @@ class Seinfeld
     end
 
     def time_left
-      require 'ruby-debug'
       Time.zone = self.time_zone
       now = Time.zone.now
       tomorrow = Time.zone.parse(Date.tomorrow.to_s)
