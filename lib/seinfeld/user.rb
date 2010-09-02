@@ -169,6 +169,8 @@ class Seinfeld
 
     def update_location!
       data = Yajl::Parser.parse(http_conn.get("http://github.com/api/v2/json/user/show/#{login}").body)
+      return if data.nil?
+      return if data["user"].nil?
       self.location = data["user"]["location"]
       save!
     end
