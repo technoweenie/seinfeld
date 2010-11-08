@@ -8,7 +8,7 @@ class Seinfeld
       attr_accessor :user_agent
       attr_writer   :connection
     end
-    self.user_agent = 'Calendar About Nothing: http://github.com/technoweenie/seinfeld'
+    self.user_agent = 'Calendar About Nothing: https://github.com/technoweenie/seinfeld'
 
     # A Array of Hashes of the parsed event JSON.
     attr_reader :items
@@ -37,7 +37,7 @@ class Seinfeld
     # Returns Seinfeld::Feed instance.
     def self.fetch(login)
       user = login.is_a?(User) ? login : User.new(:login => login.to_s)
-      url  = "http://github.com/#{user.login}.json"
+      url  = "https://github.com/#{user.login}.json"
       resp = connection.get(url, 'If-None-Match' => user.etag)
       new(login, resp, url)
     rescue Yajl::ParseError, Faraday::Error::ClientError

@@ -20,7 +20,7 @@
                 }).append('<img src="http://calendaraboutnothing.com/images/x_1.png" height="80%" width="50%">');
                 $progressed.append($x);
              });
-            $seinfeld.append($streaks).append('<p class="pimpage"><a href="http://github.com/lachlanhardy/seinfeld-badge">Want your own badge?</a></p>');
+            $seinfeld.append($streaks).append('<p class="pimpage"><a href="https://github.com/lachlanhardy/seinfeld-badge">Want your own badge?</a></p>');
         });
     });
 })();
