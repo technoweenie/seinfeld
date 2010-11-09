@@ -1,3 +1,6 @@
+require 'yajl'
+require 'faraday'
+
 class Seinfeld
   class User < ActiveRecord::Base
     has_many :progressions, :order => 'seinfeld_progressions.created_at', :dependent => :delete_all
@@ -141,6 +144,53 @@ class Seinfeld
         self.longest_streak_start = highest_streak.started
         self.longest_streak_end   = highest_streak.ended
       end
+    end
+
+    def time_left
+      Time.zone = self.time_zone
+      now = Time.zone.now
+      tomorrow = Time.zone.parse(Date.tomorrow.to_s)
+      seconds_until_tomorrow = (tomorrow - now)
+      hours = (seconds_until_tomorrow/3600).to_i
+      minutes = (seconds_until_tomorrow/60 - hours * 60).to_i
+      '%d h, %d min' % [hours, minutes]
+    end
+
+    attr_accessor :http_conn
+    def http_conn
+      @http_conn ||= begin
+                       user_agent = 'Calendar About Nothing: http://github.com/technoweenie/seinfeld'
+                       Faraday::Connection.new(:headers => {'User-Agent' => user_agent}) do |b|
+                         b.adapter :typhoeus
+                       end
+                     end
+    end
+
+    def update_location!
+      data = Yajl::Parser.parse(http_conn.get("http://github.com/api/v2/json/user/show/#{login}").body)
+      return if data.nil?
+      return if data["user"].nil?
+      self.location = data["user"]["location"]
+      save!
+    end
+    
+    # Sets User timezone based on location.
+    def update_timezone!
+      return if location.nil? || location.empty?
+      place_data = Yajl::Parser.parse(http_conn.get("http://ws.geonames.org/searchJSON?maxRows=1&q=#{location}").body)
+      location_data = place_data["geonames"].first
+      return if location_data.nil?
+      lat = location_data["lat"]
+      lng = location_data["lng"]
+      return if lat.nil? || lng.nil?
+      computed_time_zone = Yajl::Parser.parse(http_conn.get("http://ws.geonames.org/timezoneJSON?lat=#{lat}&lng=#{lng}").body)
+      time_zone_id = computed_time_zone["timezoneId"]
+      return if time_zone_id.nil?
+      reverse_mapping = ActiveSupport::TimeZone::MAPPING.invert
+      if reverse_mapping.key?(time_zone_id)
+        self.time_zone = reverse_mapping[time_zone_id]
+      end
+      save!
     end
   end
 end

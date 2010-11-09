@@ -16,6 +16,12 @@ class UpdaterTest < ActiveSupport::TestCase
           stub.get('/fred.json') do
             [404, {}, '[]']
           end
+          stub.get('/api/v2/json/user/show/bob') do
+            [200, {}, '{}']
+          end
+          stub.get('/api/v2/json/user/show/fred') do
+            [200, {}, '{}']
+          end
         end
       end
     @feed = Seinfeld::Updater.run(@user)
