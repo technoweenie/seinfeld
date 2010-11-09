@@ -1,10 +1,12 @@
 require 'rubygems'
+require 'bundler/setup'
+
 dir = File.dirname(__FILE__)
 $LOAD_PATH.unshift File.expand_path(dir)
 
 require 'erb'
 require 'logger'
-require 'active_record' # v3
+require 'active_record'
 require 'fileutils'
 
 # Gives all the AR models their own tablenamespace:
