@@ -9,6 +9,6 @@ activerecord --version '3.0.0.beta3'
 mustache
 faraday --version '~> 0.4.6'
 oauth2
-typhoeus --version '0.1.27's
+typhoeus --version '0.1.27'
 pg
 sinatra
