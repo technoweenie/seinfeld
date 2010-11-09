@@ -1,4 +1,7 @@
 require 'rubygems'
+require 'bundler'
+Bundler.setup
+
 dir = File.dirname(__FILE__)
 $LOAD_PATH.unshift File.expand_path(dir)
 
@@ -16,8 +19,7 @@ class Seinfeld < ActiveRecord::Base
     # String pointer to the root directory of the app.
     attr_accessor :root
 
-    # ActiveSupport::StringInquirer instance of the current environment.  Set
-    # by RACK_ENV or RAILS_ENV.
+    # ActiveSupport::StringInquirer instance of the current environment.  Set # by RACK_ENV or RAILS_ENV.
     attr_reader :env
 
     # String path to the database.yml
