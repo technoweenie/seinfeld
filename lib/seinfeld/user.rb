@@ -147,7 +147,7 @@ class Seinfeld
     end
 
     def time_left
-      Time.zone = self.time_zone
+      Time.zone = self.time_zone || "UTC"
       now = Time.zone.now
       tomorrow = Time.zone.parse(Date.tomorrow.to_s)
       seconds_until_tomorrow = (tomorrow - now)
