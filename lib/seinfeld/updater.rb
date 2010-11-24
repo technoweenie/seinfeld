@@ -12,8 +12,9 @@ class Seinfeld
 
     def run(today = Date.today)
       today   ||= Date.today
+      old_location = @user.location
       @user.update_location!
-      @user.update_timezone!
+      @user.update_timezone! if old_location != @user.location
       Time.zone = @user.time_zone || "UTC"
       if feed = Feed.fetch(@user)
         @user.etag = feed.etag
