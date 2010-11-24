@@ -192,7 +192,7 @@ class UserTest < ActiveSupport::TestCase
     user.http_conn = \
     Faraday::Connection.new do |builder|
       builder.adapter :test do |stub|
-        stub.get('/searchJSON?q=gibberish&maxRows=1') do
+        stub.get('/searchJSON?maxRows=1&q=gibberish') do
           [200, {}, '{"totalResultsCount":0,"geonames":[]}']
         end
       end
@@ -206,7 +206,7 @@ class UserTest < ActiveSupport::TestCase
     user.http_conn = \
     Faraday::Connection.new do |builder|
       builder.adapter :test do |stub|
-        stub.get('/searchJSON?q=gibberish&maxRows=1') do
+        stub.get('/searchJSON?maxRows=1&q=gibberish') do
           [200, {}, '{"geonames":[{"countryName":"United States","adminCode1":"CO"}]}']
         end
       end
@@ -220,10 +220,10 @@ class UserTest < ActiveSupport::TestCase
     user.http_conn = \
     Faraday::Connection.new do |builder|
       builder.adapter :test do |stub|
-        stub.get('/searchJSON?q=gibberish&maxRows=1') do
+        stub.get('/searchJSON?maxRows=1&q=gibberish') do
           [200, {}, '{"geonames":[{"lng":-105.2705456,"lat":40.0149856}]}']
         end
-        stub.get('/timezoneJSON?lng=-105.2705456&lat=40.0149856') do
+        stub.get('/timezoneJSON?lat=40.0149856&lng=-105.2705456') do
           [200, {}, '{"rawOffset":0,"dstOffset":0,"gmtOffset":0,"lng":0,"lat":0}']
         end
       end
@@ -237,10 +237,10 @@ class UserTest < ActiveSupport::TestCase
     user.http_conn = \
     Faraday::Connection.new do |builder|
       builder.adapter :test do |stub|
-        stub.get('/searchJSON?q=gibberish&maxRows=1') do
+        stub.get('/searchJSON?maxRows=1&q=gibberish') do
           [200, {}, '{"geonames":[{"lng":-105.2705456,"lat":40.0149856}]}']
         end
-        stub.get('/timezoneJSON?lng=-105.2705456&lat=40.0149856') do
+        stub.get('/timezoneJSON?lat=40.0149856&lng=-105.2705456') do
           [200, {}, '{"timezoneId":"Mars/Space"}']
         end
       end
@@ -254,10 +254,10 @@ class UserTest < ActiveSupport::TestCase
     user.http_conn = \
     Faraday::Connection.new do |builder|
       builder.adapter :test do |stub|
-        stub.get('/searchJSON?q=gibberish&maxRows=1') do
+        stub.get('/searchJSON?maxRows=1&q=gibberish') do
           [200, {}, '{"geonames":[{"lng":-105.2705456,"lat":40.0149856}]}']
         end
-        stub.get('/timezoneJSON?lng=-105.2705456&lat=40.0149856') do
+        stub.get('/timezoneJSON?lat=40.0149856&lng=-105.2705456') do
           [200, {}, '{"timezoneId":"America/Denver"}']
         end
       end
