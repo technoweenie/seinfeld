@@ -184,7 +184,7 @@ class UserTest < ActiveSupport::TestCase
   test "#update_timezone! if location is empty" do
     user = Seinfeld::User.new :login => 'bob', :location => ''
     user.update_timezone!
-    assert_equal nil, user.time_zone
+    assert_equal "UTC", user.time_zone
   end
 
   test "#update_timezone! if no location can be found" do
