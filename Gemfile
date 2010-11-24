@@ -9,3 +9,8 @@ gem "mustache",        "~> 0.11.2"
 gem "faraday",         "~> 0.5.3"
 gem "oauth2",          "~> 0.1.0"
 gem "typhoeus",        "~> 0.1.31"
+gem "mysql",           "~> 2.8.1"
+
+group :test do
+  gem "running_man",   "~> 0.2.1"
+end

@@ -14,7 +14,7 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
-desc 'Default: run specs.'
+desc 'Default: run tests.'
 task :default => 'test'
 
 desc "Open an irb session preloaded with this library"
