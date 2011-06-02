@@ -33,7 +33,7 @@ class UpdaterTest < ActiveSupport::TestCase
   end
 
   test "parses atom entries" do
-    assert_equal 8, @feed.items.size
+    assert_equal 9, @feed.items.size
   end
 
   test "parses entry published timestamp" do
@@ -45,6 +45,7 @@ class UpdaterTest < ActiveSupport::TestCase
       Date.civil(2009, 12, 19),
       Date.civil(2009, 12, 17),
       Date.civil(2009, 12, 16),
-      Date.civil(2009, 12, 15)], @feed.committed_days
+      Date.civil(2009, 12, 15),
+      Date.civil(2009, 12, 12)], @feed.committed_days
   end
 end

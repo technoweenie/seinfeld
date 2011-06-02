@@ -93,8 +93,14 @@ class Seinfeld
     # Returns true if the entry is a commit, and false if it isn't.
     def self.committed?(item)
       type = item['type']
-      VALID_EVENTS.include?(type) || (
-        type == 'CreateEvent' && item['payload'] && item['payload']['object'] == 'branch')
+
+      return true if VALID_EVENTS.include?(type)
+      if type == 'CreateEvent'
+        return true if item['payload'] && item['payload']['object'] == 'branch'
+        return true if item['url'] && item['url'] =~ %r[/compare/]
+      end
+
+      return false
     end
 
     def inspect
