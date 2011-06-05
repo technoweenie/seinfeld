@@ -53,9 +53,10 @@ class Seinfeld
     end
 
     get '/~:name/update' do
-      user = Seinfeld::User.find_by_login(name.downcase)
+      name = params[:name].downcase
+      user = Seinfeld::User.find_by_login(name)
       Seinfeld::Updater.run(user)
-      redirect '/~#{name}'
+      redirect "/~#{name}"
     end
 
     get '/~:name/widget' do
