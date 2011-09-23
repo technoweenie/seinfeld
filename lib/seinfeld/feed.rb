@@ -84,7 +84,7 @@ class Seinfeld
       end
     end
 
-    VALID_EVENTS = %w(PushEvent CommitEvent ForkApplyEvent)
+    VALID_EVENTS = %w(PushEvent CommitEvent ForkApplyEvent GistEvent)
 
     # Determines whether the given entry counts as a commit or not.
     #
