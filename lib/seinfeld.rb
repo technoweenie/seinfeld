@@ -1,9 +1,13 @@
+require 'rubygems'
+require 'bundler/setup'
+
 dir = File.dirname(__FILE__)
 $LOAD_PATH.unshift File.expand_path(dir)
 
 require 'erb'
 require 'logger'
-require 'active_record' # v3
+require 'active_record'
+require 'fileutils'
 
 # Gives all the AR models their own tablenamespace:
 #
@@ -33,7 +37,7 @@ class Seinfeld < ActiveRecord::Base
   end
 
   self.oauth = {
-    :site              => "https://github.com",
+    :site              => ENV['OAUTH_SITE'] || "https://github.com",
     :authorize_path    => "/login/oauth/authorize",
     :access_token_path => "/login/oauth/access_token",
     :client_id         => ENV['OAUTH_CLIENT_ID'],

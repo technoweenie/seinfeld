@@ -6,15 +6,15 @@
     %link{:rel => 'stylesheet', :type => 'text/css', :href => '/styles/main.css'}
   %body
     .title 
-      %a{:rel => "me", :href => "http://github.com/#{@user.login}"}
+      %a{:rel => "me", :href => "https://github.com/#{@user.login}"}
         == #{@user.login}'s
       CAN Widget
     %form#widget
       %p
         This JavaScript widget was written by
-        %a{:href => "http://github.com/lachlanhardy"} lachlanhardy
+        %a{:href => "https://github.com/lachlanhardy"} lachlanhardy
         and uses jQuery.  Please direct any requests or patches to the
-        %a{:href => "http://github.com/lachlanhardy/seinfeld-badge"} seinfeld-badge
+        %a{:href => "https://github.com/lachlanhardy/seinfeld-badge"} seinfeld-badge
         repo so they can be pushed upstream to the CAN.
       %p
         %textarea
@@ -23,7 +23,7 @@
 
             <div class="seinfeld-badge user-#{@user.login}">
               <h2>I like open software</h2>
-              <p><a href="http://calendaraboutnothing.com/~#{@user.login}" rel="me">Calendar About Nothing</a> tracks my public contributions on <A href="http://github.com/#{@user.login}">GitHub</a>.</p>
+              <p><a href="http://calendaraboutnothing.com/~#{@user.login}" rel="me">Calendar About Nothing</a> tracks my public contributions on <A href="https://github.com/#{@user.login}">GitHub</a>.</p>
             </div> <!-- .seinfeld-badge .user-#{@user.login} -->
             
             <!-- Using Google's CDN for JS -->
@@ -53,6 +53,5 @@
               %span.desc days
       #content.footnote 
         %a{:href => "http://calendaraboutnothing.com"} Calendar About Nothing
-        by <a href="http://techno-weenie.net">rick</a> and <a href="http://warpspire.com/">kyle</a> / <a href="http://github.com">GitHub</a>
+        by <a href="http://techno-weenie.net">rick</a> and <a href="http://warpspire.com/">kyle</a> / <a href="https://github.com">GitHub</a>
         <br />hosting by <a href="http://heroku.com">Heroku</a>
-        <br />DNS by <a href="http://www.zerigo.com/managed-dns">Zerigo</a>

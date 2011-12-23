@@ -10,11 +10,17 @@ class UpdaterTest < ActiveSupport::TestCase
     Seinfeld::Feed.connection = \
       Faraday::Connection.new do |builder|
         builder.adapter :test do |stub|
-          stub.get('/bob.json') do 
+          stub.get('/users/bob/events') do 
             [200, {"etag" => "abc"}, data]
           end
-          stub.get('/fred.json') do
+          stub.get('/users/fred/events') do
             [404, {}, '[]']
+          end
+          stub.get('/users/bob') do
+            [200, {}, '{}']
+          end
+          stub.get('/users/fred') do
+            [200, {}, '{}']
           end
         end
       end

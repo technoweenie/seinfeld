@@ -14,7 +14,7 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
-desc 'Default: run specs.'
+desc 'Default: run tests.'
 task :default => 'test'
 
 desc "Open an irb session preloaded with this library"
@@ -45,9 +45,10 @@ namespace :seinfeld do
   desc "Scan USER feeds."
   task :scan => :init do
     raise "Need USER=" if ENV['USER'].blank?
+    ENV['FEED_PAGE'] ||= '1'
     user = Seinfeld::User.find_by_login(ENV['USER'])
     Time.zone = user.time_zone || 'UTC'
-    feed = Seinfeld::Feed.fetch(user.login)
+    feed = Seinfeld::Feed.fetch(user.login, ENV['FEED_PAGE'])
     feed.items.each do |item|
       puts "#{item['type']} - #{item['created_at']} - #{Seinfeld::Feed.committed?(item).inspect}"
     end

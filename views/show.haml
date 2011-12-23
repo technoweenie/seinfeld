@@ -8,13 +8,24 @@
     %script{:type => 'text/javascript', :src => '/javascripts/application.js'}
   %body
     .title 
-      %a{:rel => "me", :href => "http://github.com/#{@user.login}"}
+      %a{:rel => "me", :href => "https://github.com/#{@user.login}"}
         == #{@user.login}'s
       Calendar
     .subtitle Tracking Open Source Contributions
     #calendar
       = seinfeld
     #main
+      #zone
+        Location: 
+        == "#{@user.location}"
+        %a{:rel => "me", :href => "http://github.com/#{@user.login}"}
+          (from profile page)
+        |
+        Zone:
+        == "#{@user.time_zone}" 
+        |
+        Time left today:
+        == #{@user.time_left}
       #stats
         .current_streak
           %span.type
@@ -31,10 +42,12 @@
               %span.desc days
       #content.footnote 
         %a{:href => "http://calendaraboutnothing.com"} Calendar About Nothing
-        by <a href="http://techno-weenie.net">rick</a> and <a href="http://warpspire.com/">kyle</a> / <a href="http://github.com">GitHub</a>
+        by <a href="http://techno-weenie.net">rick</a> and <a href="http://warpspire.com/">kyle</a> / <a href="https://github.com">GitHub</a>
         <br />hosting by <a href="http://heroku.com">Heroku</a>
-        <br />DNS by <a href="http://www.zerigo.com/managed-dns">Zerigo</a>
       #content.footnote 
         Put the 
         %a{:href=> "/~#{@user.login}/widget"} JavaScript widget
         on your site!
+      #content.footnote
+        Geographical information provided by 
+        %a{:href => 'http://www.geonames.org'} GeoNames
