@@ -37,7 +37,7 @@ class Seinfeld
     # Returns Seinfeld::Feed instance.
     def self.fetch(login)
       user = login.is_a?(User) ? login : User.new(:login => login.to_s)
-      url  = "https://github.com/#{user.login}.json"
+      url = "https://api.github.com/users/#{user.login}/events"
       resp = connection.get(url, 'If-None-Match' => user.etag)
       new(login, resp, url)
     rescue Yajl::ParseError, Faraday::Error::ClientError
@@ -94,7 +94,8 @@ class Seinfeld
     def self.committed?(item)
       type = item['type']
       VALID_EVENTS.include?(type) || (
-        type == 'CreateEvent' && item['payload'] && item['payload']['object'] == 'branch')
+        type == 'CreateEvent' && item['payload'] && 
+        (item['payload']['ref_type'] || item['payload']['object']) == 'branch')
     end
 
     def inspect
