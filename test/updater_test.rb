@@ -16,10 +16,10 @@ class UpdaterTest < ActiveSupport::TestCase
           stub.get('/users/fred/events') do
             [404, {}, '[]']
           end
-          stub.get('/api/v2/json/user/show/bob') do
+          stub.get('/users/bob') do
             [200, {}, '{}']
           end
-          stub.get('/api/v2/json/user/show/fred') do
+          stub.get('/users/fred') do
             [200, {}, '{}']
           end
         end
