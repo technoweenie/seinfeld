@@ -71,7 +71,10 @@ namespace :seinfeld do
     user = Seinfeld::User.find_by_login(ENV['USER'])
     Time.zone = user.time_zone || 'UTC'
     user.fix_progress
-    puts user.inspect
+    user.save!
+    puts "#{u.login}#{' (disabled)' if u.disabled?}#{" #{u.time_zone}" if u.time_zone}"
+    puts "Current Streak: #{u.current_streak} #{u.streak_start} => #{u.streak_end}"
+    puts "Longest Streak: #{u.longest_streak} #{u.longest_streak_start} => #{u.longest_streak_end}"
   end
 
   desc "Sets USER's timezone to ZONE."
