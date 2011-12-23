@@ -88,7 +88,7 @@ namespace :seinfeld do
         puts header << feed.inspect
       rescue
         puts header << "#{$!.class}: #{$!.inspect}"
-        $:.backtrace { |b| puts " >> #{b}" }
+        $!.backtrace { |b| puts " >> #{b}" }
       end
     end
 
