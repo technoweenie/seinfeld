@@ -72,9 +72,9 @@ namespace :seinfeld do
     Time.zone = user.time_zone || 'UTC'
     user.fix_progress
     user.save!
-    puts "#{u.login}#{' (disabled)' if u.disabled?}#{" #{u.time_zone}" if u.time_zone}"
-    puts "Current Streak: #{u.current_streak} #{u.streak_start} => #{u.streak_end}"
-    puts "Longest Streak: #{u.longest_streak} #{u.longest_streak_start} => #{u.longest_streak_end}"
+    puts "#{user.login}#{' (disabled)' if user.disabled?}#{" #{user.time_zone}" if user.time_zone}"
+    puts "Current Streak: #{user.current_streak} #{user.streak_start} => #{user.streak_end}"
+    puts "Longest Streak: #{user.longest_streak} #{user.longest_streak_start} => #{user.longest_streak_end}"
   end
 
   desc "Sets USER's timezone to ZONE."
