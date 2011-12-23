@@ -156,15 +156,11 @@ class Seinfeld
       '%d h, %d min' % [hours, minutes]
     end
 
-    attr_accessor :http_conn
     def http_conn
-      @http_conn ||= begin
-       user_agent = 'Calendar About Nothing: http://github.com/technoweenie/seinfeld'
-       Faraday::Connection.new(:headers => {'User-Agent' => user_agent}) do |b|
-         b.adapter :typhoeus
-       end
-     end
+      @http_conn ||= Seinfeld::Feed.connection
     end
+
+    attr_writer :http_conn
 
     def update_location!
       data = Yajl::Parser.parse(http_conn.get("https://api.github.com/users/#{login}").body)

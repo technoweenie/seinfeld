@@ -158,7 +158,7 @@ class UserTest < ActiveSupport::TestCase
     user.http_conn = \
     Faraday::Connection.new do |builder|
       builder.adapter :test do |stub|
-        stub.get('/api/v2/json/user/show/bob') do
+        stub.get('/users/bob') do
           [200, {}, '{"user":{"name":"Bob"}}']
         end
       end
@@ -172,7 +172,7 @@ class UserTest < ActiveSupport::TestCase
     user.http_conn = \
     Faraday::Connection.new do |builder|
       builder.adapter :test do |stub|
-        stub.get('/api/v2/json/user/show/bob') do
+        stub.get('/users/bob') do
           [200, {}, '{"user":{"name":"Bob","location":"Boulder, CO"}}']
         end
       end
