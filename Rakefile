@@ -45,9 +45,10 @@ namespace :seinfeld do
   desc "Scan USER feeds."
   task :scan => :init do
     raise "Need USER=" if ENV['USER'].blank?
+    ENV['FEED_PAGE'] ||= '1'
     user = Seinfeld::User.find_by_login(ENV['USER'])
     Time.zone = user.time_zone || 'UTC'
-    feed = Seinfeld::Feed.fetch(user.login)
+    feed = Seinfeld::Feed.fetch(user.login, ENV['FEED_PAGE'])
     feed.items.each do |item|
       puts "#{item['type']} - #{item['created_at']} - #{Seinfeld::Feed.committed?(item).inspect}"
     end

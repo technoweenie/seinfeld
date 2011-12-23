@@ -36,10 +36,13 @@ class Seinfeld
     # login - String login name from GitHub.
     # 
     # Returns Seinfeld::Feed instance.
-    def self.fetch(login)
+    def self.fetch(login, page = nil)
       user = login.is_a?(User) ? login : User.new(:login => login.to_s)
       url = "https://api.github.com/users/#{user.login}/events"
-      resp = connection.get(url, 'If-None-Match' => user.etag)
+      resp = connection.get url do |req|
+        req.headers['If-None-Match'] = user.etag
+        req.params['page'] = (page || 1).to_s
+      end
       new(login, resp, url)
     end
 
