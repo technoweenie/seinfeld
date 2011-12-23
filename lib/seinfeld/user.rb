@@ -79,8 +79,7 @@ class Seinfeld
     def fix_progress(today = Date.today)
       date = nil
       streak = Streak.new
-      progs = progressions.limit(100).to_a.reverse
-      progs.each do |prog|
+      progressions.reverse.each do |prog|
         prog_date = prog.created_at.to_date
         if date
           date = date - 1

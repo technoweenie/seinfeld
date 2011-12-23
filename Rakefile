@@ -42,6 +42,17 @@ namespace :seinfeld do
     puts "Longest Streak: #{u.longest_streak} #{u.longest_streak_start} => #{u.longest_streak_end}"
   end
 
+  desc "Inspect USER progressions."
+  task :progressions => :init do
+    raise "Need USER=" if ENV['USER'].blank?
+    u = Seinfeld::User.find_by_login(ENV['USER'])
+    progs = u.progressions.to_a
+    puts "#{progs.size} days for #{u.login}"
+    progs.each do |prog|
+      puts prog.inspect
+    end
+  end
+
   desc "Scan USER feeds."
   task :scan => :init do
     raise "Need USER=" if ENV['USER'].blank?
