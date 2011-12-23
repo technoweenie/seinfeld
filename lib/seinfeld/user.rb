@@ -60,8 +60,8 @@ class Seinfeld
     #
     # Returns nothing.
     def update_progress(days, today = Date.today)
-      days      = filter_existing_days(days)
-      streaks   = [current_streak = Streak.new(streak_start, streak_end)]
+      days = filter_existing_days(days)
+      streaks = [current_streak = Streak.new(streak_start, streak_end)]
 
       days.sort!
       transaction do

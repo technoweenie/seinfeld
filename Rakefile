@@ -80,10 +80,11 @@ namespace :seinfeld do
   
   desc "Update the calendar of USER"
   task :update => :init do
+    ENV['FEED_PAGE'] ||= '1'
     update_user = lambda do |user|
       header = "#{user.login}#{' (disabled)' if user.disabled?} - "
       begin
-        feed = Seinfeld::Updater.run(user)
+        feed = Seinfeld::Updater.run(user, ENV['FEED_PAGE'])
         puts header << feed.inspect
       rescue
         puts header << "#{$!.class}: #{$!.inspect}"
