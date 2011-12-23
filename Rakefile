@@ -54,6 +54,15 @@ namespace :seinfeld do
     end
   end
 
+  desc "Fix USER progress."
+  task :fix_progress => :init do
+    raise "Need USER=" if ENV['USER'].blank?
+    user = Seinfeld::User.find_by_login(ENV['USER'])
+    Time.zone = user.time_zone || 'UTC'
+    user.fix_progress
+    puts user.inspect
+  end
+
   desc "Sets USER's timezone to ZONE."
   task :tz => :init do
     raise "Need USER=" if ENV['USER'].to_s.size.zero?

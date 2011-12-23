@@ -71,6 +71,34 @@ class Seinfeld
       end
     end
 
+    # Public: Sets the latest streak from the current data.
+    #
+    # today - Optional Date instance representing today.
+    # 
+    # Returns nothing.
+    def fix_progress(today = Date.today)
+      date = nil
+      streak = Streak.new
+      progs = progressions.limit(100).to_a.reverse
+      progs.each do |prog|
+        prog_date = prog.created_at.to_date
+        if date
+          date = date - 1
+          if prog_date == date
+            streak.started = date
+          else
+            return
+          end
+        else
+          streak.started = streak.ended = date = prog_date
+        end
+      end
+    ensure
+      if streak.days > 0
+        update_from_streaks([streak], today)
+      end
+    end
+
     # Public: Clears all progression data for a user.
     #
     # Returns nothing.
@@ -131,7 +159,7 @@ class Seinfeld
     # streaks - Array of Streak objects.  This is used to set the various 
     #           streak related attributes on User.
     # today   - A Date instance representing today.
-    def update_from_streaks(streaks, today)
+    def update_from_streaks(streaks, today = Date.today)
       highest_streak = streaks.empty? ? 0 : streaks.max { |a, b| a.days <=> b.days }
       if latest_streak = streaks.last
         self.streak_start   = latest_streak.started
