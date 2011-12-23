@@ -23,10 +23,11 @@ class Seinfeld
     attr_accessor :etag
 
     def self.connection
-      @connection ||= Faraday::Connection.new(
-          :headers => {'User-Agent' => user_agent}
-        ) do |b|
-          b.adapter :typhoeus
+      @connection ||= begin
+        options = {:headers => {'User-Agent' => user_agent}}
+        Faraday::Connection.new(options) do |builder|
+          builder.adapter :typhoeus
+        end
       end
     end
 
@@ -40,14 +41,6 @@ class Seinfeld
       url = "https://api.github.com/users/#{user.login}/events"
       resp = connection.get(url, 'If-None-Match' => user.etag)
       new(login, resp, url)
-    rescue Yajl::ParseError, Faraday::Error::ClientError
-      # TODO: Raise Seinfeld::Feed::Error instead
-      if $!.message =~ /404/
-        nil # the user is missing, disable them
-      else
-        # some other error?
-        new(login, "[]", url)
-      end
     end
 
     # Parses the given data with Yajl.
@@ -58,15 +51,16 @@ class Seinfeld
     #
     # Returns Seinfeld::Feed.
     def initialize(login, data, url = nil)
+      @url ||= :direct
+      @disabled = false
       @login = login.to_s
       if data.respond_to?(:body)
         @etag = data.headers['etag']
-        data  = data.body.to_s
+        data = data.body.to_s
       else
         data = data.to_s
       end
-      @url ||= :direct
-      @items = Yajl::Parser.parse(data) || []
+      @items = parse(data)
     end
 
     # Public: Scans the parsed atom entries and pulls out all committed days.
@@ -98,8 +92,22 @@ class Seinfeld
         (item['payload']['ref_type'] || item['payload']['object']) == 'branch')
     end
 
+    def disabled?
+      @disabled
+    end
+
     def inspect
       %(#<Seinfeld::Feed:#{@url} (#{items.size})>)
+    end
+
+    def parse(json)
+      Yajl::Parser.parse(json) || []
+    rescue Yajl::ParseError, Faraday::Error::ClientError
+      # TODO: Raise Seinfeld::Feed::Error instead
+      if $!.message =~ /404/
+        @disabled = true
+      end
+      []
     end
   end
 end
