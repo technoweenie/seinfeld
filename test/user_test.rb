@@ -7,10 +7,26 @@ class UserTest < ActiveSupport::TestCase
     @user     = Seinfeld::User.create! :login => 'user', 
       :streak_start => Date.civil(2007, 12, 30), :streak_end => Date.civil(2007, 12, 31), :current_streak => 2,
       :longest_streak_start => Date.civil(2007, 12, 30), :longest_streak_end => Date.civil(2007, 12, 31), :longest_streak => 2
+    @user.progressions.create!(:created_at => Date.civil(2006, 12, 30))
     @user.progressions.create!(:created_at => Date.civil(2007, 12, 30))
     @user.progressions.create!(:created_at => Date.civil(2007, 12, 31))
     Seinfeld::Progression.create! :user_id => @user.id+1
     @today = Date.civil(2008, 1, 3)
+  end
+
+  test "fixes progress" do
+    @user.update_attributes \
+      :streak_start => nil, :streak_end => nil, :current_streak => nil,
+      :longest_streak => nil, :longest_streak_start => nil, :longest_streak_end => nil
+    @user.fix_progress(@today)
+    assert_equal Date.civil(2007, 12, 30), @user.streak_start
+    assert_equal Date.civil(2007, 12, 31), @user.streak_end
+    assert_equal 0, @user.current_streak
+
+    @user.fix_progress(Date.civil(2007, 12, 31))
+    assert_equal Date.civil(2007, 12, 30), @user.streak_start
+    assert_equal Date.civil(2007, 12, 31), @user.streak_end
+    assert_equal 2, @user.current_streak
   end
 
   test "downcases login" do
@@ -75,9 +91,9 @@ class UserTest < ActiveSupport::TestCase
   test "#update_progress with user, keeping the streak" do
     parsed_dates = [Date.civil(2007, 12, 31), Date.civil(2008, 1, 1), Date.civil(2008, 1, 2)]
 
-    assert_equal 2, @user.progressions.count
+    assert_equal 3, @user.progressions.count
     @user.update_progress parsed_dates, @today
-    assert_equal 4, @user.progressions.count
+    assert_equal 5, @user.progressions.count
     assert_equal parsed_dates, @user.progress_for(2008, 1, 1)
 
     assert_equal 4, @user.longest_streak
@@ -91,9 +107,9 @@ class UserTest < ActiveSupport::TestCase
   test "#update_progress with user, breaking the streak" do
     parsed_dates = [Date.civil(2007, 12, 31), Date.civil(2008, 1, 1)]
 
-    assert_equal 2, @user.progressions.count
-    @user.update_progress parsed_dates, @today
     assert_equal 3, @user.progressions.count
+    @user.update_progress parsed_dates, @today
+    assert_equal 4, @user.progressions.count
     assert_equal parsed_dates, @user.progress_for(2008, 1, 1)
 
     assert_equal 3, @user.longest_streak
@@ -107,9 +123,9 @@ class UserTest < ActiveSupport::TestCase
   test "#update_progress with user, starting new streak" do
     parsed_dates = [Date.civil(2007, 12, 31), Date.civil(2008, 1, 2)]
 
-    assert_equal 2, @user.progressions.count
-    @user.update_progress parsed_dates, @today
     assert_equal 3, @user.progressions.count
+    @user.update_progress parsed_dates, @today
+    assert_equal 4, @user.progressions.count
     assert_equal parsed_dates, @user.progress_for(2008, 1, 1)
 
     assert_equal 2, @user.longest_streak
@@ -121,7 +137,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "#clear_progress clears all user data" do
-    assert_equal 3, Seinfeld::Progression.count
+    assert_equal 4, Seinfeld::Progression.count
 
     @user.clear_progress
     assert_equal 1, Seinfeld::Progression.count
