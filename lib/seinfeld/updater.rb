@@ -2,8 +2,8 @@ class Seinfeld
   class Updater
     attr_reader :user
 
-    def self.run(user, today = nil)
-      new(user).run(today)
+    def self.run(user, today = nil, page = nil)
+      new(user).run(today, page)
     end
 
     def initialize(user)

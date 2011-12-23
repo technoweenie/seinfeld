@@ -84,7 +84,7 @@ namespace :seinfeld do
     update_user = lambda do |user|
       header = "#{user.login}#{' (disabled)' if user.disabled?} - "
       begin
-        feed = Seinfeld::Updater.run(user, ENV['FEED_PAGE'])
+        feed = Seinfeld::Updater.run(user, nil, ENV['FEED_PAGE'])
         puts header << feed.inspect
       rescue
         puts header << "#{$!.class}: #{$!.inspect}"
