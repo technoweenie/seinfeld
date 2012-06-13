@@ -113,7 +113,7 @@ class Seinfeld
     get '/auth/callback' do
       begin
         api  = oauth.get_access_token(params[:code], :redirect_uri => oauth_redirect_url)
-        data = Yajl::Parser.parse(api.get('/api/v2/json/user/show'))
+        data = Yajl::Parser.parse(api.get('https://api.github.com/user'))
         session[:user] = data['user']
         redirect "/edit"
       rescue Yajl::ParseError
