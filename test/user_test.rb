@@ -175,7 +175,7 @@ class UserTest < ActiveSupport::TestCase
     Faraday::Connection.new do |builder|
       builder.adapter :test do |stub|
         stub.get('/users/bob') do
-          [200, {}, '{"user":{"name":"Bob"}}']
+          [200, {}, '{"name":"Bob"}']
         end
       end
     end
@@ -189,7 +189,7 @@ class UserTest < ActiveSupport::TestCase
     Faraday::Connection.new do |builder|
       builder.adapter :test do |stub|
         stub.get('/users/bob') do
-          [200, {}, '{"user":{"name":"Bob","location":"Boulder, CO"}}']
+          [200, {}, '{"name":"Bob","location":"Boulder, CO"}']
         end
       end
     end
