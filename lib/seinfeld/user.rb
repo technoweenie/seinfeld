@@ -74,7 +74,7 @@ class Seinfeld
     # Public: Sets the latest streak from the current data.
     #
     # today - Optional Date instance representing today.
-    # 
+    #
     # Returns nothing.
     def fix_progress(today = Date.today)
       date = nil
