@@ -14,7 +14,7 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
-desc 'Default: run specs.'
+desc 'Default: run tests.'
 task :default => 'test'
 
 desc "Open an irb session preloaded with this library"
@@ -42,15 +42,39 @@ namespace :seinfeld do
     puts "Longest Streak: #{u.longest_streak} #{u.longest_streak_start} => #{u.longest_streak_end}"
   end
 
+  desc "Inspect USER progressions."
+  task :progressions => :init do
+    raise "Need USER=" if ENV['USER'].blank?
+    u = Seinfeld::User.find_by_login(ENV['USER'])
+    progs = u.progressions.to_a
+    puts "#{progs.size} days for #{u.login}"
+    progs.each do |prog|
+      puts prog.inspect
+    end
+  end
+
   desc "Scan USER feeds."
   task :scan => :init do
     raise "Need USER=" if ENV['USER'].blank?
+    ENV['FEED_PAGE'] ||= '1'
     user = Seinfeld::User.find_by_login(ENV['USER'])
     Time.zone = user.time_zone || 'UTC'
-    feed = Seinfeld::Feed.fetch(user.login)
+    feed = Seinfeld::Feed.fetch(user.login, ENV['FEED_PAGE'])
     feed.items.each do |item|
       puts "#{item['type']} - #{item['created_at']} - #{Seinfeld::Feed.committed?(item).inspect}"
     end
+  end
+
+  desc "Fix USER progress."
+  task :fix_progress => :init do
+    raise "Need USER=" if ENV['USER'].blank?
+    user = Seinfeld::User.find_by_login(ENV['USER'])
+    Time.zone = user.time_zone || 'UTC'
+    user.fix_progress
+    user.save!
+    puts "#{user.login}#{' (disabled)' if user.disabled?}#{" #{user.time_zone}" if user.time_zone}"
+    puts "Current Streak: #{user.current_streak} #{user.streak_start} => #{user.streak_end}"
+    puts "Longest Streak: #{user.longest_streak} #{user.longest_streak_start} => #{user.longest_streak_end}"
   end
 
   desc "Sets USER's timezone to ZONE."
@@ -79,13 +103,15 @@ namespace :seinfeld do
   
   desc "Update the calendar of USER"
   task :update => :init do
+    ENV['FEED_PAGE'] ||= '1'
     update_user = lambda do |user|
       header = "#{user.login}#{' (disabled)' if user.disabled?} - "
       begin
-        feed = Seinfeld::Updater.run(user)
+        feed = Seinfeld::Updater.run(user, nil, ENV['FEED_PAGE'])
         puts header << feed.inspect
       rescue
         puts header << "#{$!.class}: #{$!.inspect}"
+        $!.backtrace { |b| puts " >> #{b}" }
       end
     end
 

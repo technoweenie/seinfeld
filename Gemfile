@@ -1,5 +1,6 @@
 source "http://rubygems.org"
 
+gem "rake"
 gem "sinatra",         "~> 1.1.0"
 gem "haml",            "~> 3.0.23"
 gem "memcache-client", "~> 1.8.5"

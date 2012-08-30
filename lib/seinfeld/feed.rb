@@ -23,10 +23,11 @@ class Seinfeld
     attr_accessor :etag
 
     def self.connection
-      @connection ||= Faraday::Connection.new(
-          :headers => {'User-Agent' => user_agent}
-        ) do |b|
-          b.adapter :typhoeus
+      @connection ||= begin
+        options = {:headers => {'User-Agent' => user_agent}}
+        Faraday::Connection.new(options) do |builder|
+          builder.adapter :typhoeus
+        end
       end
     end
 
@@ -35,19 +36,14 @@ class Seinfeld
     # login - String login name from GitHub.
     # 
     # Returns Seinfeld::Feed instance.
-    def self.fetch(login)
+    def self.fetch(login, page = nil)
       user = login.is_a?(User) ? login : User.new(:login => login.to_s)
-      url  = "https://github.com/#{user.login}.json"
-      resp = connection.get(url, 'If-None-Match' => user.etag)
-      new(login, resp, url)
-    rescue Yajl::ParseError, Faraday::Error::ClientError
-      # TODO: Raise Seinfeld::Feed::Error instead
-      if $!.message =~ /404/
-        nil # the user is missing, disable them
-      else
-        # some other error?
-        new(login, "[]", url)
+      url = "https://api.github.com/users/#{user.login}/events"
+      resp = connection.get url do |req|
+        req.headers['If-None-Match'] = user.etag
+        req.params['page'] = (page || 1).to_s
       end
+      new(login, resp, url)
     end
 
     # Parses the given data with Yajl.
@@ -58,15 +54,16 @@ class Seinfeld
     #
     # Returns Seinfeld::Feed.
     def initialize(login, data, url = nil)
+      @url ||= :direct
+      @disabled = false
       @login = login.to_s
       if data.respond_to?(:body)
         @etag = data.headers['etag']
-        data  = data.body.to_s
+        data = data.body.to_s
       else
         data = data.to_s
       end
-      @url ||= :direct
-      @items = Yajl::Parser.parse(data) || []
+      @items = parse(data)
     end
 
     # Public: Scans the parsed atom entries and pulls out all committed days.
@@ -93,12 +90,32 @@ class Seinfeld
     # Returns true if the entry is a commit, and false if it isn't.
     def self.committed?(item)
       type = item['type']
-      VALID_EVENTS.include?(type) || (
-        type == 'CreateEvent' && item['payload'] && item['payload']['object'] == 'branch')
+      return true if VALID_EVENTS.include?(type)
+      if type == 'CreateEvent'
+        payload = item['payload']
+        return true if payload && (payload['ref_type'] || payload['object']) == 'branch'
+        return true if item['url'].to_s =~ %r[/compare/]
+      end
+
+      false
+    end
+
+    def disabled?
+      @disabled
     end
 
     def inspect
       %(#<Seinfeld::Feed:#{@url} (#{items.size})>)
+    end
+
+    def parse(json)
+      Yajl::Parser.parse(json) || []
+    rescue Yajl::ParseError, Faraday::Error::ClientError
+      # TODO: Raise Seinfeld::Feed::Error instead
+      if $!.message =~ /404/
+        @disabled = true
+      end
+      []
     end
   end
 end

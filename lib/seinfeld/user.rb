@@ -60,14 +60,41 @@ class Seinfeld
     #
     # Returns nothing.
     def update_progress(days, today = Date.today)
-      days      = filter_existing_days(days)
-      streaks   = [current_streak = Streak.new(streak_start, streak_end)]
+      days = filter_existing_days(days)
+      streaks = [current_streak = Streak.new(streak_start, streak_end)]
 
       days.sort!
       transaction do
         streaks = scan_days_for_streaks(days)
         update_from_streaks(streaks, today)
         save!
+      end
+    end
+
+    # Public: Sets the latest streak from the current data.
+    #
+    # today - Optional Date instance representing today.
+    # 
+    # Returns nothing.
+    def fix_progress(today = Date.today)
+      date = nil
+      streak = Streak.new
+      progressions.reverse.each do |prog|
+        prog_date = prog.created_at.to_date
+        if date
+          date = date - 1
+          if prog_date == date
+            streak.started = date
+          else
+            return
+          end
+        else
+          streak.started = streak.ended = date = prog_date
+        end
+      end
+    ensure
+      if streak.days > 0
+        update_from_streaks([streak], today)
       end
     end
 
@@ -131,7 +158,7 @@ class Seinfeld
     # streaks - Array of Streak objects.  This is used to set the various 
     #           streak related attributes on User.
     # today   - A Date instance representing today.
-    def update_from_streaks(streaks, today)
+    def update_from_streaks(streaks, today = Date.today)
       highest_streak = streaks.empty? ? 0 : streaks.max { |a, b| a.days <=> b.days }
       if latest_streak = streaks.last
         self.streak_start   = latest_streak.started
@@ -156,39 +183,37 @@ class Seinfeld
       '%d h, %d min' % [hours, minutes]
     end
 
-    attr_accessor :http_conn
     def http_conn
-      @http_conn ||= begin
-                       user_agent = 'Calendar About Nothing: http://github.com/technoweenie/seinfeld'
-                       Faraday::Connection.new(:headers => {'User-Agent' => user_agent}) do |b|
-                         b.adapter :typhoeus
-                       end
-                     end
+      @http_conn ||= Seinfeld::Feed.connection
     end
 
+    attr_writer :http_conn
+
     def update_location!
-      data = Yajl::Parser.parse(http_conn.get("http://github.com/api/v2/json/user/show/#{login}").body)
+      data = Yajl::Parser.parse(http_conn.get("https://api.github.com/users/#{login}").body)
       return if data.nil?
-      return if data["user"].nil?
-      self.location = data["user"]["location"]
+      self.location = data["location"]
       save!
     end
     
     # Sets User timezone based on location.
     def update_timezone!
-      return if location.nil? || location.empty?
-      place_data = Yajl::Parser.parse(http_conn.get("http://ws.geonames.org/searchJSON?maxRows=1&q=#{location}").body)
-      location_data = place_data["geonames"].first
-      return if location_data.nil?
-      lat = location_data["lat"]
-      lng = location_data["lng"]
-      return if lat.nil? || lng.nil?
-      computed_time_zone = Yajl::Parser.parse(http_conn.get("http://ws.geonames.org/timezoneJSON?lat=#{lat}&lng=#{lng}").body)
-      time_zone_id = computed_time_zone["timezoneId"]
-      return if time_zone_id.nil?
-      reverse_mapping = ActiveSupport::TimeZone::MAPPING.invert
-      if reverse_mapping.key?(time_zone_id)
-        self.time_zone = reverse_mapping[time_zone_id]
+      if location.nil? || location.empty?
+        self.time_zone = "UTC"
+      else
+        place_data = Yajl::Parser.parse(http_conn.get("http://ws.geonames.org/searchJSON?maxRows=1&q=#{location}").body)
+        location_data = place_data["geonames"].first
+        return if location_data.nil?
+        lat = location_data["lat"]
+        lng = location_data["lng"]
+        return if lat.nil? || lng.nil?
+        computed_time_zone = Yajl::Parser.parse(http_conn.get("http://ws.geonames.org/timezoneJSON?lat=#{lat}&lng=#{lng}").body)
+        time_zone_id = computed_time_zone["timezoneId"]
+        return if time_zone_id.nil?
+        reverse_mapping = ActiveSupport::TimeZone::MAPPING.invert
+        if reverse_mapping.key?(time_zone_id)
+          self.time_zone = reverse_mapping[time_zone_id]
+        end
       end
       save!
     end

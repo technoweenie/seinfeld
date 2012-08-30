@@ -36,7 +36,7 @@ class Seinfeld < ActiveRecord::Base
   end
 
   self.oauth = {
-    :site              => "https://github.com",
+    :site              => ENV['OAUTH_SITE'] || "https://github.com",
     :authorize_path    => "/login/oauth/authorize",
     :access_token_path => "/login/oauth/access_token",
     :client_id         => ENV['OAUTH_CLIENT_ID'],
