@@ -1,6 +1,16 @@
 require File.join(File.dirname(__FILE__), "test_helper")
 
 class FeedTest < ActiveSupport::TestCase
+  class Response < Struct.new(:body, :header_values, :error)
+    def headers
+      self.header_values ||= {}
+    end
+
+    def success?
+      !error
+    end
+  end
+
   data = feed_data(:simple)
 
   setup_once do
@@ -15,6 +25,24 @@ class FeedTest < ActiveSupport::TestCase
 
   test "parses atom entries" do
     assert_equal 9, @feed.items.size
+  end
+
+  test "knows feed is not disabled" do
+    assert !@feed.disabled?
+  end
+
+  test "parses from Faraday Response" do
+    res = Response.new(data)
+    feed = Seinfeld::Feed.new :technoweenie, res
+    assert !feed.disabled?
+    assert_equal 9, feed.items.size
+  end
+
+  test "disables 404 response" do
+    res = Response.new(data, nil, true)
+    feed = Seinfeld::Feed.new :technoweenie, res
+    assert feed.disabled?
+    assert_equal 0, feed.items.size
   end
 
   test "parses entry published timestamp" do

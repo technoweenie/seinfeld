@@ -34,7 +34,7 @@ class Seinfeld
     # Public: Downloads a user's public feed from GitHub.
     #
     # login - String login name from GitHub.
-    # 
+    #
     # Returns Seinfeld::Feed instance.
     def self.fetch(login, page = nil)
       user = login.is_a?(User) ? login : User.new(:login => login.to_s)
@@ -58,6 +58,12 @@ class Seinfeld
       @disabled = false
       @login = login.to_s
       if data.respond_to?(:body)
+        if !data.success?
+          @disabled = true
+          @items = []
+          return
+        end
+
         @etag = data.headers['etag']
         data = data.body.to_s
       else
