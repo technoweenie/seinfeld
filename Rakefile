@@ -61,7 +61,13 @@ namespace :seinfeld do
     Time.zone = user.time_zone || 'UTC'
     feed = Seinfeld::Feed.fetch(user.login, ENV['FEED_PAGE'])
     feed.items.each do |item|
-      puts "#{item['type']} - #{item['created_at']} - #{Seinfeld::Feed.committed?(item).inspect}"
+      begin
+        puts "#{item['type']} - #{item['created_at']} - #{Seinfeld::Feed.committed?(item).inspect}"
+      rescue
+        puts $!
+        puts item.inspect
+        $!.backtrace.each { |b| puts " > #{b}" }
+      end
     end
   end
 
