@@ -52,6 +52,13 @@ class Seinfeld
       show_user_json
     end
 
+    get '/~:name/update' do
+      name = params[:name].downcase
+      user = Seinfeld::User.find_by_login(name)
+      Seinfeld::Updater.run(user)
+      redirect "/~#{name}"
+    end
+
     get '/~:name/widget' do
       if params[:name].present?
         @user = Seinfeld::User.find_by_login(params[:name].downcase)

@@ -12,5 +12,6 @@ gem "typhoeus",        "~> 0.1.31"
 gem "mysql",           "~> 2.8.1"
 
 group :test do
+  gem "rack-test",     "~> 0.6.0"
   gem "running_man",   "~> 0.2.1"
 end
