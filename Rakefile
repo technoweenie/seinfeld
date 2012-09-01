@@ -118,7 +118,7 @@ namespace :seinfeld do
   task :activate => :init do
     login = ENV['user'].to_s
     if login.size.zero?
-      Seinfeld::User.activate_group(50)
+      Seinfeld::User.activate_all
     else
       Seinfeld::User.activate_user(login)
     end
