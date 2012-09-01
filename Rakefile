@@ -106,7 +106,24 @@ namespace :seinfeld do
       user.destroy
     end
   end
-  
+
+  desc "Counts active and disabled users"
+  task :count => :init do
+    active = Seinfeld::User.active.count
+    disabled = Seinfeld::User.count - active
+    puts "#{active} active users, #{disabled} disabled users"
+  end
+
+  desc "Re-enables a USER."
+  task :activate => :init do
+    login = ENV['user'].to_s
+    if login.size.zero?
+      Seinfeld::User.activate_group(50)
+    else
+      Seinfeld::User.activate_user(login)
+    end
+  end
+
   desc "Update the calendar of USER"
   task :update => :init do
     ENV['FEED_PAGE'] ||= '1'

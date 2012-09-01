@@ -31,6 +31,20 @@ class Seinfeld
       write_attribute :login, s.blank? ? nil : s.downcase
     end
 
+    def self.activate_group(limit = 50)
+      disabled = connection.quote_column_name :disabled
+      truthy = connection.quoted_true
+      falsey = connection.quoted_false
+      sql = "UPDATE #{quoted_table_name} SET #{disabled} = #{falsey} WHERE #{disabled} = #{truthy} LIMIT #{limit.to_i}"
+      connection.execute(sql)
+    end
+
+    def self.activate_user(login)
+      if user = find_by_login(login)
+        user.update_attributes :disabled => false
+      end
+    end
+
     # Public: Queries a user's progress for a given month.
     #
     # Example
