@@ -1,13 +1,13 @@
 require File.join(File.dirname(__FILE__), "test_helper")
 
 class FeedTest < ActiveSupport::TestCase
-  class Response < Struct.new(:body, :header_values, :error)
+  class Response < Struct.new(:body, :header_values, :status)
     def headers
       self.header_values ||= {}
     end
 
     def success?
-      !error
+      !status
     end
   end
 
@@ -38,8 +38,15 @@ class FeedTest < ActiveSupport::TestCase
     assert_equal 9, feed.items.size
   end
 
+  test "parses from Faraday 304 Response" do
+    res = Response.new(data, nil, 304)
+    feed = Seinfeld::Feed.new :technoweenie, res
+    assert !feed.disabled?
+    assert_equal 9, feed.items.size
+  end
+
   test "disables 404 response" do
-    res = Response.new(data, nil, true)
+    res = Response.new(data, nil, 404)
     feed = Seinfeld::Feed.new :technoweenie, res
     assert feed.disabled?
     assert_equal 0, feed.items.size
@@ -58,3 +65,4 @@ class FeedTest < ActiveSupport::TestCase
       Date.civil(2009, 12, 12)], @feed.committed_days
   end
 end
+

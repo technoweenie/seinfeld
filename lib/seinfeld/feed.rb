@@ -58,7 +58,7 @@ class Seinfeld
       @disabled = false
       @login = login.to_s
       if data.respond_to?(:body)
-        if !data.success?
+        if !(data.success? || data.status == 304)
           @disabled = true
           @items = []
           return

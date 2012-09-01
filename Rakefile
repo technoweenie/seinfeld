@@ -106,7 +106,7 @@ namespace :seinfeld do
       user.destroy
     end
   end
-  
+
   desc "Update the calendar of USER"
   task :update => :init do
     ENV['FEED_PAGE'] ||= '1'
