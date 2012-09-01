@@ -31,12 +31,8 @@ class Seinfeld
       write_attribute :login, s.blank? ? nil : s.downcase
     end
 
-    def self.activate_group(limit = 50)
-      disabled = connection.quote_column_name :disabled
-      truthy = connection.quoted_true
-      falsey = connection.quoted_false
-      sql = "UPDATE #{quoted_table_name} SET #{disabled} = #{falsey} WHERE #{disabled} = #{truthy} LIMIT #{limit.to_i}"
-      connection.execute(sql)
+    def self.activate_all
+      update_all({:disabled => false}, :disabled => true)
     end
 
     def self.activate_user(login)
