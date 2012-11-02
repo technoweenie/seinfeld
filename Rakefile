@@ -151,6 +151,17 @@ namespace :seinfeld do
     end
   end
 
+  desc "Do a full update for USER"
+  task :full_update => :init do
+    user = Seinfeld::User.find_by_login(ENV['USER'])
+    raise "No user found for #{ENV['USER'].inspect}" unless user
+    puts "#{user.login}#{' (disabled)' if user.disabled?} - "
+    updater = Seinfeld::Updater.new(user)
+    (1..10).to_a.reverse.each do |page|
+      updater.run(Date.today, page)
+    end
+  end
+
   desc "Clear progress of all users"
   task :clear_all => :init do
     Seinfeld::User.paginated_each { |u| u.clear_progress }
