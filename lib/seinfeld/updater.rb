@@ -23,7 +23,6 @@ class Seinfeld
         @user.save!
         nil
       else
-        puts "#{@user.login}"
         @user.etag = feed.etag
         @user.update_progress(feed.committed_days, today)
         feed

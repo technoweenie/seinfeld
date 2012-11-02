@@ -165,12 +165,16 @@ end
 
 desc "cron task for keeping the CAN updated.  Run once every hour."
 task :cron => 'seinfeld:init' do
-  count, errored, items, committed = 0, 0, 0, 0
+  count, errored, empty, items, committed = 0, 0, 0, 0, 0
   Seinfeld::User.active.paginated_each do |user|
     begin
       if feed = Seinfeld::Updater.run(user)
         if feed.items.size.zero?
-          errored += 1
+          if feed.disabled?
+            errored += 1
+          else
+            empty += 1
+          end
         else
           count     += 1
           items     += feed.items.size
@@ -182,7 +186,7 @@ task :cron => 'seinfeld:init' do
       puts "#{user.login}: [#{$!.class}] #{$!.inspect}"
     end
   end
-  puts "#{count} user(s), #{errored} bad/empty feed(s), #{items} event(s), #{committed} committed day(s)!"
+  puts "#{count} user(s), #{errored} bad, #{empty} empty feed(s), #{items} event(s), #{committed} committed day(s)!"
 end
 
 namespace :db do
