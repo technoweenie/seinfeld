@@ -58,6 +58,7 @@ class Seinfeld
       @disabled = false
       @login = login.to_s
       if data.respond_to?(:body)
+        @status = data.status
         if !(data.success? || data.status == 304)
           @disabled = true if data.status == 404
           @items = []
@@ -111,7 +112,7 @@ class Seinfeld
     end
 
     def inspect
-      %(#<Seinfeld::Feed:#{@url} (#{items.size})>)
+      %(#<Seinfeld::Feed:#{@url} #{@status} @disabled=#{@disabled.inspect} (#{items.size})>)
     end
 
     def parse(json)
