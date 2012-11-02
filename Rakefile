@@ -172,6 +172,13 @@ namespace :seinfeld do
     raise "Need USER=" if ENV['USER'].blank?
     Seinfeld::User.find_by_login(ENV['USER']).clear_progress
   end
+
+  desc "List active users"
+  task :list => :init do
+    Seinfeld::User.active.paginated_each do |user|
+      puts user.login
+    end
+  end
 end
 
 desc "cron task for keeping the CAN updated.  Run once every hour."
