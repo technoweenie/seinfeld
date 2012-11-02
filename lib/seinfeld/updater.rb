@@ -18,10 +18,12 @@ class Seinfeld
       Time.zone = @user.time_zone || "UTC"
       feed = Feed.fetch(@user, page)
       if feed.disabled?
+        puts "#{@user.login} #{feed.inspect}"
         @user.disabled = true
         @user.save!
         nil
       else
+        puts "#{@user.login}"
         @user.etag = feed.etag
         @user.update_progress(feed.committed_days, today)
         feed
