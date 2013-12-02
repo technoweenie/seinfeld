@@ -130,7 +130,7 @@ class Seinfeld
         "%s's Calendar" % @user.login
       end
 
-      def get_user_and_progressions(extra = 0, name = params[:name])
+      def get_user_and_progressions(extra = params[:extra].to_i, name = params[:name])
         return Set.new if name.blank?
 
         [:year, :month].each do |key|
